@@ -53,3 +53,9 @@ DEPENDENCIES
   rspec (~> 3.1)
   sqlite3
   timecop
+
+RUBY VERSION
+   ruby 2.2.1p85
+
+BUNDLED WITH
+   1.16.0
