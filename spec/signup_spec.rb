@@ -6,8 +6,8 @@ describe Signup do
     it "creates an account with one user" do
       account = stub_created(Account)
       user    = stub_created(User)
-      logger  = double("logger")
       mailer  = stub_mailer_with(account, user)
+      logger  = FakeLogger.new
       signup  = Signup.new(
         logger: logger,
         email: "user@example.com",
@@ -20,6 +20,8 @@ describe Signup do
       expect(User).to have_received(:create!)
         .with(account: account, email: "user@example.com")
       expect(mailer).to have_received(:deliver)
+      expect(logger.output)
+        .to eq("[INFO] Sign up email sent with subject: #{mailer.subject}")
       expect(result).to be(true)
     end
   end
@@ -31,11 +33,21 @@ describe Signup do
   end
 
   def stub_mailer_with(account, user)
-    double(SignupMailer).tap do |instance|
-      allow(SignupMailer).to receive(:new)
-        .with(account: account, user: user)
-        .and_return(instance)
-      allow(instance).to receive(:deliver)
+    subject = "Your new #{account.name} account"
+
+    double(SignupMailer.name, subject: subject).tap do |instance|
+        allow(SignupMailer).to receive(:new)
+          .with(account: account, user: user)
+          .and_return(instance)
+        allow(instance).to receive(:deliver)
     end
+  end
+end
+
+class FakeLogger
+  attr_reader :output
+
+  def info(mailer_subject)
+    @output = "[INFO] Sign up email sent with subject: #{mailer_subject}"
   end
 end
