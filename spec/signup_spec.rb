@@ -36,7 +36,7 @@ describe Signup do
     subject = "Your new #{account.name} account"
 
     double(SignupMailer.name, subject: subject).tap do |instance|
-        allow(SignupMailer).to receive(:new)
+        allow(SignupMailer).to receive(:signup)
           .with(account: account, user: user)
           .and_return(instance)
         allow(instance).to receive(:deliver)
